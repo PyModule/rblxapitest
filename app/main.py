@@ -98,3 +98,30 @@ async def getuserlvl(username: str):
         return {output[0][0]: output[0][1]}
 
 
+@app.get('/allusers')
+async def allusers():
+    connection = sqlite3.connect("lvl.sqlite3")
+
+    cursor = connection.cursor()
+
+    getuser_query = f"""
+        SELECT
+            *
+        FROM userlvl
+    """
+
+    output = cursor.execute(getuser_query).fetchall()
+
+    connection.commit()
+    
+    connection.close()
+
+    if not output:
+        return "There is nothing in the DB to display"
+    
+    else:
+        user_dict = {}
+        for i in output:
+            user_dict[i[0]] = i[1]
+
+        return user_dict
