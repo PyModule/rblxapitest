@@ -46,7 +46,7 @@ async def userlvl(verify: verify):
     return "Ready for verification"
 
 @app.get('/rblxverify/{username}')
-async def getuserlvl(username: str):
+async def getcordname(username: str):
 
     connection = sqlite3.connect("verification.sqlite3")
 
@@ -93,7 +93,7 @@ async def verifyuser(username: str):
     return 'User is now verified'
 
 
-@app.get('isverified/{username}')
+@app.get('/isverified/{username}')
 async def isverified(username: str):
     connection = sqlite3.connect("verification.sqlite3")
 
