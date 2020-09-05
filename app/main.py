@@ -94,7 +94,7 @@ async def verifyuser(username: str):
 
 
 @app.get('isverified/{username}')
-async def isverified(username: str)
+async def isverified(username: str):
     connection = sqlite3.connect("verification.sqlite3")
 
     cursor = connection.cursor()
