@@ -71,6 +71,52 @@ async def getuserlvl(username: str):
     else:
         return output[0][1]
 
+@app.get('/rblxverify/{username}/verified')
+async def verifyuser(username: str):
+    connection = sqlite3.connect("verification.sqlite3")
+
+    cursor = connection.cursor()
+
+    update_user = f"""
+        UPDATE 
+            verify
+        SET
+            verified = "Yes"
+        WHERE username = "{username}"
+        """
+    cursor.execute(update_user)
+
+    connection.commit()
+
+    connection.close()
+
+    return 'User is now verified'
+
+
+@app.get('isverified/{username}')
+async def isverified(username: str)
+    connection = sqlite3.connect("verification.sqlite3")
+
+    cursor = connection.cursor()
+
+    getuser_query = f"""
+        SELECT
+            *
+        FROM verify
+        where verify.username = "{username}"
+    """
+
+    output = cursor.execute(getuser_query).fetchall()
+
+    connection.commit()
+    
+    connection.close()
+
+    if not output:
+        return "User was not found in the DB!"
+
+    else:
+        return output[0][2]
 
 
 @app.get('/allusers')
