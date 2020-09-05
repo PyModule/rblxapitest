@@ -17,7 +17,6 @@ CREATE TABLE IF NOT EXISTS verify (
 );
 """
 
-
 @app.get('/')
 def root():
     return {"Message": 'Hello World!'}
