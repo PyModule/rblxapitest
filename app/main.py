@@ -135,14 +135,14 @@ async def isverified(username: str):
 
 @app.get('/allusers')
 async def allusers():
-    connection = sqlite3.connect("lvl.sqlite3")
+    connection = sqlite3.connect("verification.sqlite3")
 
     cursor = connection.cursor()
 
     getuser_query = f"""
         SELECT
             *
-        FROM userlvl
+        FROM verify
     """
 
     output = cursor.execute(getuser_query).fetchall()
@@ -157,8 +157,20 @@ async def allusers():
     else:
         user_dict = {}
         for i in output:
-            user_dict[i[0]] = i[1]
+            user_dict[i[0]] = (i[1], i[2])
 
         return user_dict
 
-#
+@app.get('/cleartable')
+async def cleartable():
+    connection = sqlite3.connect("verification.sqlite3")
+
+    cursor = connection.cursor()
+
+    cursor.execute("DROP TABLE IF EXISTS verify")
+
+    connection.commit()
+
+    connection.close()
+
+    return "DB has been cleared"
