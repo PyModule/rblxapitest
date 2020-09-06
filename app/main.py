@@ -31,18 +31,33 @@ async def userlvl(verify: verify):
 
     cursor.execute(create_table)
 
-    insertion_query = f"""
-    INSERT INTO verify (username, cordname, verified)
-    VALUES
-    {tuple((verify.username, verify.cordname, "No"))}
+    getuser_query = f"""
+        SELECT
+            *
+        FROM verify
+        where verify.username = "{verify.username}"
     """
-    cursor.execute(insertion_query)
 
-    connection.commit()
+    output = cursor.execute(getuser_query).fetchall()
 
-    connection.close()
+    if output:
+        connection.close()
+        return "user already exists!"
 
-    return "Ready for verification"
+    else:
+
+        insertion_query = f"""
+        INSERT INTO verify (username, cordname, verified)
+        VALUES
+        {tuple((verify.username, verify.cordname, "No"))}
+        """
+        cursor.execute(insertion_query)
+
+        connection.commit()
+
+        connection.close()
+
+        return "Ready for verification"
 
 @app.get('/rblxverify/{username}')
 async def getcordname(username: str):
