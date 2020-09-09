@@ -151,8 +151,8 @@ async def getrblxid(cordname: str):
 
     cursor.execute(create_table)
 
-    print(cordname)
-    
+    cordname = cordname.replace('-','#')
+
     getuser_query = f"""
         SELECT
             *
