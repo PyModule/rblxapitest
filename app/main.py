@@ -162,6 +162,8 @@ async def getrblxid(cordname: str):
 
     connection.close()
 
+    print(output)
+
     return output[0][3]
 
 @app.get('/cleartable')
