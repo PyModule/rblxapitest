@@ -5,6 +5,7 @@ import sqlite3
 class verify(BaseModel):
     username: str
     cordname: str
+    rblxid: int
 
 app = FastAPI()
 
@@ -13,18 +14,12 @@ create_table= """
 CREATE TABLE IF NOT EXISTS verify (
   username text,
   cordname text,
-  verified text
+  verified text,
+  rblxid int
 );
 """
 
-@app.get('/')
-def root():
-    return {"Message": 'Hello World!'}
-
-
-@app.post('/verify')
-async def userlvl(verify: verify):
-
+def get_user(username):
     connection = sqlite3.connect("verification.sqlite3")
 
     cursor = connection.cursor()
@@ -35,21 +30,38 @@ async def userlvl(verify: verify):
         SELECT
             *
         FROM verify
-        where verify.username = "{verify.username}"
+        where verify.username = "{username}"
     """
 
     output = cursor.execute(getuser_query).fetchall()
 
+    connection.close()
+
+    return output
+
+
+@app.get('/')
+def root():
+    return {"Message": 'Hello World!'}
+
+
+@app.post('/verify')
+async def userlvl(verify: verify):
+
+    output = get_user(verify.username)
+
     if output:
-        connection.close()
         return "user already exists!"
 
     else:
+        connection = sqlite3.connect("verification.sqlite3")
+
+        cursor = connection.cursor()
 
         insertion_query = f"""
-        INSERT INTO verify (username, cordname, verified)
+        INSERT INTO verify (username, cordname, verified, rblxid)
         VALUES
-        {tuple((verify.username, verify.cordname, "No"))}
+        {tuple((verify.username, verify.cordname, "No", verify.rblxid))}
         """
         cursor.execute(insertion_query)
 
@@ -62,22 +74,7 @@ async def userlvl(verify: verify):
 @app.get('/rblxverify/{username}')
 async def getcordname(username: str):
 
-    connection = sqlite3.connect("verification.sqlite3")
-
-    cursor = connection.cursor()
-
-    getuser_query = f"""
-        SELECT
-            *
-        FROM verify
-        where verify.username = "{username}"
-    """
-
-    output = cursor.execute(getuser_query).fetchall()
-
-    connection.commit()
-    
-    connection.close()
+    output = get_user(username)
 
     if not output:
         return "User was not found in the DB!"
@@ -109,22 +106,7 @@ async def verifyuser(username: str):
 
 @app.get('/isverified/{username}')
 async def isverified(username: str):
-    connection = sqlite3.connect("verification.sqlite3")
-
-    cursor = connection.cursor()
-
-    getuser_query = f"""
-        SELECT
-            *
-        FROM verify
-        where verify.username = "{username}"
-    """
-
-    output = cursor.execute(getuser_query).fetchall()
-
-    connection.commit()
-    
-    connection.close()
+    output = get_user(username)
 
     if not output:
         return "User was not found in the DB!"
@@ -160,6 +142,27 @@ async def allusers():
             user_dict[i[0]] = (i[1], i[2])
 
         return user_dict
+
+@app.get('/rblxid/{cordname}')
+async def getrblxid(cordname: str):
+    connection = sqlite3.connect("verification.sqlite3")
+
+    cursor = connection.cursor()
+
+    cursor.execute(create_table)
+
+    getuser_query = f"""
+        SELECT
+            *
+        FROM verify
+        where verify.cordname = "{cordname}"
+    """
+
+    output = cursor.execute(getuser_query).fetchall()
+
+    connection.close()
+
+    return output[0][3]
 
 @app.get('/cleartable')
 async def cleartable():
