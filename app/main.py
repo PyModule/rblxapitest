@@ -151,11 +151,13 @@ async def getrblxid(cordname: str):
 
     cursor.execute(create_table)
 
+    print(cordname)
+    
     getuser_query = f"""
         SELECT
             *
         FROM verify
-        where verify.cordname = {cordname}
+        where verify.cordname = "{cordname}"
     """
 
     output = cursor.execute(getuser_query).fetchall()
